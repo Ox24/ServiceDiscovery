@@ -11,6 +11,9 @@ public class Role {
     List<RoleProperty> RoleProps;
     String Model;
 
+    public Role() {
+    }
+
     public Role(String ID, List<MessageInterface> anInterface, List<RoleProperty> roleProps, String model) {
         this.ID = ID;
         MessageInterfaces = anInterface;
@@ -57,11 +60,11 @@ public class Role {
         RoleProps = roleProps;
     }
 
-    public List<MessageInterface> getInterface() {
+    public List<MessageInterface> getMessageInterfaces() {
         return MessageInterfaces;
     }
 
-    public void setInterface(List<MessageInterface> anInterface) {
+    public void setMessageInterfaces(List<MessageInterface> anInterface) {
         MessageInterfaces = anInterface;
     }
 }

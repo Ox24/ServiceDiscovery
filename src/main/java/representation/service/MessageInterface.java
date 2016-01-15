@@ -9,6 +9,9 @@ public class MessageInterface {
     Message In;
     Message Out;
 
+    public MessageInterface() {
+    }
+
     public MessageInterface(String MessageID, MessageInterfaceType type, Message in, Message out) {
         this.MessageID = MessageID;
         Type = type;

@@ -10,6 +10,9 @@ public class Message {
     MessageType Type;
     List<MessageParam> Params;
 
+    public Message() {
+    }
+
     public Message(String ID, MessageType type, List<MessageParam> params) {
         this.ID = ID;
         Type = type;

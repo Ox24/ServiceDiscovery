@@ -7,6 +7,9 @@ public class MessageParam {
     String Name;
     MessageParamType Type;
 
+    public MessageParam() {
+    }
+
     public MessageParam(String name, MessageParamType type) {
         Name = name;
         Type = type;
