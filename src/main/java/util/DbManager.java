@@ -1,8 +1,8 @@
 package util;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.db.ODatabaseRecordThreadLocal;
+import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
-import com.sun.org.apache.bcel.internal.generic.RET;
 import representation.service.Service;
 
 import java.util.LinkedList;
@@ -20,7 +20,7 @@ public class DbManager {
 
     private static OObjectDatabaseTx db;
 
-    public static void init(){
+    public static synchronized void init(){
         try{
             db = new OObjectDatabaseTx(UtilConst.DATABASE_LOCATION).create();
         } catch (Exception e){
@@ -32,7 +32,7 @@ public class DbManager {
         db.close();
     }
 
-    public static boolean registerService(Service service){
+    public static synchronized boolean registerService(Service service){
         if(db.isClosed())
             db.open(DB_USER,DB_PW);
         try{
@@ -46,7 +46,7 @@ public class DbManager {
         return true;
     }
 
-    public static List<Service> getAllServices(){
+    public static synchronized List<Service> getAllServices(){
         LinkedList<Service> list = new LinkedList<>();
         if(db.isClosed())
             db.open(DB_USER,DB_PW);
@@ -58,6 +58,27 @@ public class DbManager {
             db.close();
         }
         return list;
+    }
+
+    public static synchronized Service getServiceByName(String name){
+        List<Service> result;
+        Service service;
+        ODatabaseRecordThreadLocal.INSTANCE.set(db.getUnderlying());
+        if(db.isClosed())
+            db.open(DB_USER,DB_PW);
+        try {
+            result = db.query(
+                    new OSQLSynchQuery<Service>("select * from Service where ServiceName = '" + name + "'"));
+            service = createServiceFromDatabase(result.get(0));
+        }finally {
+            db.close();
+        }
+        return service;
+    }
+
+    private static Service createServiceFromDatabase(Service service){
+        ODatabaseRecordThreadLocal.INSTANCE.set(db.getUnderlying());
+        return db.detachAll(service, true);
     }
 
 }

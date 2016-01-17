@@ -3,10 +3,7 @@ package api;
 import com.orientechnologies.orient.core.db.ODatabaseRecordThreadLocal;
 import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import representation.service.*;
 import util.DbManager;
 import util.UtilConst;
@@ -24,6 +21,11 @@ public class ServiceController {
     @RequestMapping("/api/services")
     public List<Service> getServices(){
         return DbManager.getAllServices();
+    }
+
+    @RequestMapping("/api/service/{serviceName}")
+    public Service getSerivceByName(@PathVariable String serviceName){
+        return DbManager.getServiceByName(serviceName);
     }
 
     @RequestMapping(value = "/api/service/register", method = RequestMethod.POST)
