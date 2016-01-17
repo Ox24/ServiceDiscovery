@@ -4,8 +4,8 @@ package representation.service;
  * Created by Timur on 1/14/2016.
  */
 public class MessageParam {
-    String Name;
-    MessageParamType Type;
+    protected String Name;
+    protected MessageParamType Type;
 
     public MessageParam() {
     }

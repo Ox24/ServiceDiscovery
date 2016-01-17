@@ -1,16 +1,19 @@
 package representation.service;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import org.springframework.data.annotation.Id;
+import org.springframework.stereotype.Repository;
 
 /**
  * Created by Timur on 1/14/2016.
  */
-@JsonPropertyOrder({ "ServiceId", "ServiceName", "role" })
+
 public class Service {
 
-    int ServiceId;
-    String ServiceName;
-    Role role;
+    @Id
+    protected int ServiceId;
+    protected String ServiceName;
+    protected Role role;
 
     public Service(){}
 

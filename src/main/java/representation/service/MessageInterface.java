@@ -4,10 +4,10 @@ package representation.service;
  * Created by Timur on 1/14/2016.
  */
 public class MessageInterface {
-    String MessageID;
-    MessageInterfaceType Type;
-    Message In;
-    Message Out;
+    protected String MessageID;
+    protected MessageInterfaceType Type;
+    protected Message In;
+    protected Message Out;
 
     public MessageInterface() {
     }

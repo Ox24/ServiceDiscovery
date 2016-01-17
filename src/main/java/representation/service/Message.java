@@ -6,9 +6,9 @@ import java.util.List;
  * Created by Timur on 1/14/2016.
  */
 public class Message {
-    String ID;
-    MessageType Type;
-    List<MessageParam> Params;
+    protected String ID;
+    protected MessageType Type;
+    protected List<MessageParam> Params;
 
     public Message() {
     }

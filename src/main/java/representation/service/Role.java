@@ -6,10 +6,10 @@ import java.util.List;
  * Created by Timur on 1/14/2016.
  */
 public class Role {
-    String ID;
-    List<MessageInterface> MessageInterfaces;
-    List<RoleProperty> RoleProps;
-    String Model;
+    protected String ID;
+    protected List<MessageInterface> MessageInterfaces;
+    protected List<RoleProperty> RoleProps;
+    protected String Model;
 
     public Role() {
     }
