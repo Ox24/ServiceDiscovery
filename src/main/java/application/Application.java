@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
+import util.DbManager;
 import util.UtilConst;
 
 @SpringBootApplication
@@ -12,17 +13,7 @@ import util.UtilConst;
 public class Application {
 
     public static void main(String[] args) {
-
-        OObjectDatabaseTx db;
-        try{
-            db = new OObjectDatabaseTx(UtilConst.DATABASE_LOCATION).create();
-        } catch (Exception e){
-            db = new OObjectDatabaseTx(UtilConst.DATABASE_LOCATION);
-        }
-        if(db.isClosed())
-            db.open("admin", "admin");
-        db.getEntityManager().registerEntityClasses("representation.service");
-        db.close();
+        DbManager.init();
         SpringApplication.run(Application.class, args);
     }
 }
