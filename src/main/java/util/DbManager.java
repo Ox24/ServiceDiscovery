@@ -7,6 +7,7 @@ import representation.service.Service;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by Timur on 16.01.2016.
@@ -32,18 +33,19 @@ public class DbManager {
         db.close();
     }
 
-    public static synchronized boolean registerService(Service service){
+    public static synchronized Service registerService(Service service){
+        service.setServiceId(UUID.randomUUID().toString());
         if(db.isClosed())
             db.open(DB_USER,DB_PW);
         try{
             db.save(service);
         }catch (Exception e){
-            return false;
+            return null;
         }
         finally {
             db.close();
         }
-        return true;
+        return service;
     }
 
     public static synchronized List<Service> getAllServices(){
@@ -74,6 +76,25 @@ public class DbManager {
             db.close();
         }
         return service;
+    }
+
+    public static synchronized boolean unregisterServiceByID(String ID){
+        List<Service> result;
+        if(db.isClosed())
+            db.open(DB_USER,DB_PW);
+        try {
+            result = db.query(
+                    new OSQLSynchQuery<Service>("select * from Service where ServiceId = '" + ID + "'"));
+            for (Service service : result){
+                db.delete(service);
+            }
+        }catch (Exception e){
+            return false;
+        }
+        finally {
+            db.close();
+        }
+        return true;
     }
 
     private static Service createServiceFromDatabase(Service service){

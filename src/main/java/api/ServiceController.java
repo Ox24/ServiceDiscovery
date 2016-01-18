@@ -29,10 +29,15 @@ public class ServiceController {
     }
 
     @RequestMapping(value = "/api/service/register", method = RequestMethod.POST)
-    public HttpStatus registerService(@RequestBody Service service){
-        if(DbManager.registerService(service))
+    public Service registerService(@RequestBody Service service){
+        return DbManager.registerService(service);
+    }
+
+    @RequestMapping(value = "/api/service/unregister/{serviceID}", method = RequestMethod.DELETE)
+    public HttpStatus unregisterService(@PathVariable String serviceID){
+        if(DbManager.unregisterServiceByID(serviceID))
             return HttpStatus.OK;
-        return HttpStatus.BAD_REQUEST;
+        return HttpStatus.CONFLICT;
     }
 
 }
