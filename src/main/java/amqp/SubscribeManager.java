@@ -55,7 +55,7 @@ public class SubscribeManager {
      * @param type
      * @throws Exception
      */
-    public void createChannel (String exchangeName, String type) throws Exception {
+    public void createChannelWithExchange(String exchangeName, String type) throws Exception {
         Channel channel;
         if (connection != null){
             channel = connection.createChannel();
@@ -71,7 +71,7 @@ public class SubscribeManager {
      * @param exchange
      * @return
      */
-    public String bindToQueue(String exchange){
+    public String bindToQueueWithExchange(String exchange){
         String queueName = null;
         Channel channel = getChannelFromExchange(exchange);
         try {
