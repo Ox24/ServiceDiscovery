@@ -13,6 +13,10 @@ import java.util.concurrent.TimeoutException;
 /**
  * Created by Timur on 03.01.2016.
  */
+
+/**
+ * Singleton which is used for Subcribe Management
+ */
 public class SubscribeManager {
     private static SubscribeManager ourInstance = new SubscribeManager();
     private Connection connection = null;
@@ -25,6 +29,11 @@ public class SubscribeManager {
     private SubscribeManager() {
     }
 
+    /**
+     * Initialize rabbitMq connection
+     * @param host
+     * @throws Exception
+     */
     public void init(String host) throws Exception {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(host);
@@ -40,6 +49,12 @@ public class SubscribeManager {
         }
     }
 
+    /**
+     * Create a subscribe channel
+     * @param exchangeName
+     * @param type
+     * @throws Exception
+     */
     public void createChannel (String exchangeName, String type) throws Exception {
         Channel channel;
         if (connection != null){
@@ -51,6 +66,11 @@ public class SubscribeManager {
         }
     }
 
+    /**
+     * Binds queue to channel
+     * @param exchange
+     * @return
+     */
     public String bindToQueue(String exchange){
         String queueName = null;
         Channel channel = getChannelFromExchange(exchange);
@@ -63,6 +83,11 @@ public class SubscribeManager {
         return queueName;
     }
 
+    /**
+     * returns channel for subscribed exchange
+     * @param exchange
+     * @return
+     */
     public Channel getChannelFromExchange (String exchange){
         return channelMap.get(exchange);
     }

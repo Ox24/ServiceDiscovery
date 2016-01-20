@@ -10,6 +10,10 @@ import java.io.IOException;
 /**
  * Created by Timur on 1/14/2016.
  */
+
+/**
+ * Handles all messages for service options
+ */
 @Component
 @Scope("prototype")
 public class MQMApplication extends java.lang.Thread{
