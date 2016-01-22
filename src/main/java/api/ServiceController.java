@@ -24,7 +24,7 @@ public class ServiceController {
     }
 
     @RequestMapping("/api/service/name/{serviceName}")
-    public List<Service> getSerivcesByName(@PathVariable String serviceName){
+    public List<Service> getServicesByName(@PathVariable String serviceName){
         return DbManager.getServiceByName(serviceName);
     }
 

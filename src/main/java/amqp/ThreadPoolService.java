@@ -1,13 +1,11 @@
 package amqp;
 
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
-import com.rabbitmq.client.QueueingConsumer;
+import com.rabbitmq.client.*;
 import util.RetryStrategy;
 import util.UtilConst;
 
 import java.io.IOException;
+import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -56,19 +54,26 @@ public class ThreadPoolService implements Runnable {
         init(UtilConst.MQM_LOCATION);
         while (true) try {
             QueueingConsumer.Delivery request = this.consumer.nextDelivery();
-            switch (request.getProperties().getHeaders().keySet().toArray()[0].toString()){
-                case "getAllServices":
-                    break;
-                case "getServiceById":
-                    break;
-                case "getServicesByName":
-                    break;
-                case "getServicesByRoleName":
-                    break;
-                case "registerService":
-                    break;
-                case "unregisterService":
+            BasicProperties properties = request.getProperties();
+            com.rabbitmq.client.AMQP.BasicProperties replyProps = new AMQP.BasicProperties.Builder().correlationId(properties.getCorrelationId()).build();
+            Set<String> headers = properties.getHeaders().keySet();
+            if(!headers.isEmpty()){
+                switch (headers.toArray()[0].toString()){
+                    case "getAllServices":
+                        break;
+                    case "getServiceById":
+                        String s = "Test";
+                        this.channel.basicPublish("",properties.getReplyTo(),replyProps,s.getBytes());
+                        break;
+                    case "getServicesByName":
+                        break;
+                    case "getServicesByRoleName":
+                        break;
+                    case "registerService":
+                        break;
+                    case "unregisterService":
 
+                }
             }
             System.out.println("Thread name: " + Thread.currentThread().getId() + " Message :" + new String(request.getBody()));
             this.channel.basicAck(request.getEnvelope().getDeliveryTag(), false);
