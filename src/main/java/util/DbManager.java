@@ -63,20 +63,49 @@ public class DbManager {
         return list;
     }
 
-    public static synchronized Service getServiceByName(String name){
+    public static synchronized List<Service> getServiceByName(String name){
         List<Service> result;
-        Service service;
         ODatabaseRecordThreadLocal.INSTANCE.set(db.getUnderlying());
         if(db.isClosed())
             db.open(DB_USER,DB_PW);
         try {
-            result = db.query(
-                    new OSQLSynchQuery<Service>("select * from Service where ServiceName = '" + name + "'"));
-            service = createServiceFromDatabase(result.get(0));
+            result = createServiceFromDatabase(db.query(
+                    new OSQLSynchQuery<Service>("select * from Service where ServiceName = '" + name + "'")));
+
         }finally {
             db.close();
         }
-        return service;
+        return result;
+    }
+
+    public static synchronized Service getServiceById(String id){
+        List<Service> result;
+        ODatabaseRecordThreadLocal.INSTANCE.set(db.getUnderlying());
+        if(db.isClosed())
+            db.open(DB_USER,DB_PW);
+        try {
+            result = createServiceFromDatabase(db.query(
+                    new OSQLSynchQuery<Service>("select * from Service where ServiceId = '" + id + "'")));
+
+        }finally {
+            db.close();
+        }
+        return result.get(0);
+    }
+
+    public static synchronized List<Service> getServicesByRoleName(String name){
+        List<Service> result;
+        ODatabaseRecordThreadLocal.INSTANCE.set(db.getUnderlying());
+        if(db.isClosed())
+            db.open(DB_USER,DB_PW);
+        try {
+            result = createServiceFromDatabase(db.query(
+                    new OSQLSynchQuery<Service>("select * from Role where Name = '" + name + "'")));
+
+        }finally {
+            db.close();
+        }
+        return result;
     }
 
     public static synchronized boolean unregisterServiceByID(String ID){
@@ -98,9 +127,13 @@ public class DbManager {
         return true;
     }
 
-    private static Service createServiceFromDatabase(Service service){
+    private static List<Service> createServiceFromDatabase(List<Service> services){
         ODatabaseRecordThreadLocal.INSTANCE.set(db.getUnderlying());
-        return db.detachAll(service, true);
+        List<Service> handlerLessServices = new LinkedList<>();
+        for(Service service : services){
+            handlerLessServices.add(db.detachAll(service,true));
+        }
+        return handlerLessServices;
     }
 
 }

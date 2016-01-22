@@ -19,13 +19,23 @@ import java.util.List;
 public class ServiceController {
 
     @RequestMapping("/api/services")
-    public List<Service> getServices(){
+    public List<Service> getAllServices(){
         return DbManager.getAllServices();
     }
 
-    @RequestMapping("/api/service/{serviceName}")
-    public Service getSerivceByName(@PathVariable String serviceName){
+    @RequestMapping("/api/service/name/{serviceName}")
+    public List<Service> getSerivcesByName(@PathVariable String serviceName){
         return DbManager.getServiceByName(serviceName);
+    }
+
+    @RequestMapping("/api/service/id/{id}")
+    public Service getServiceById(@PathVariable String id){
+        return DbManager.getServiceById(id);
+    }
+
+    @RequestMapping("/api/service/role/{roleName}")
+    public List<Service> getServiceByRoleName(@PathVariable String roleName){
+        return DbManager.getServicesByRoleName(roleName);
     }
 
     @RequestMapping(value = "/api/service/register", method = RequestMethod.POST)

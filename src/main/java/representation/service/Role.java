@@ -6,7 +6,7 @@ import java.util.List;
  * Created by Timur on 1/14/2016.
  */
 public class Role {
-    protected String ID;
+    protected String name;
     protected List<MessageInterface> MessageInterfaces;
     protected List<RoleProperty> RoleProps;
     protected String Model;
@@ -14,34 +14,34 @@ public class Role {
     public Role() {
     }
 
-    public Role(String ID, List<MessageInterface> anInterface, List<RoleProperty> roleProps, String model) {
-        this.ID = ID;
+    public Role(String name, List<MessageInterface> anInterface, List<RoleProperty> roleProps, String model) {
+        this.name = name;
         MessageInterfaces = anInterface;
         RoleProps = roleProps;
         Model = model;
     }
 
-    public Role(String ID, List<MessageInterface> anInterface, List<RoleProperty> roleProps) {
-        this.ID = ID;
+    public Role(String name, List<MessageInterface> anInterface, List<RoleProperty> roleProps) {
+        this.name = name;
         MessageInterfaces = anInterface;
         RoleProps = roleProps;
     }
 
-    public Role(String ID) {
-        this.ID = ID;
+    public Role(String name) {
+        this.name = name;
     }
 
-    public Role(String ID, List<MessageInterface> anInterface) {
-        this.ID = ID;
+    public Role(String name, List<MessageInterface> anInterface) {
+        this.name = name;
         MessageInterfaces = anInterface;
     }
 
-    public String getID() {
-        return ID;
+    public String getName() {
+        return name;
     }
 
-    public void setID(String ID) {
-        this.ID = ID;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getModel() {
