@@ -1,6 +1,8 @@
 package amqp;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.*;
+import util.DbManager;
 import util.RetryStrategy;
 import util.UtilConst;
 
@@ -55,15 +57,20 @@ public class ThreadPoolService implements Runnable {
         while (true) try {
             QueueingConsumer.Delivery request = this.consumer.nextDelivery();
             BasicProperties properties = request.getProperties();
-            com.rabbitmq.client.AMQP.BasicProperties replyProps = new AMQP.BasicProperties.Builder().correlationId(properties.getCorrelationId()).build();
+            com.rabbitmq.client.AMQP.BasicProperties replyProps = new AMQP.BasicProperties.Builder()
+                    .correlationId(properties.getCorrelationId())
+                    .contentType("application/json")
+                    .build();
             Set<String> headers = properties.getHeaders().keySet();
             if(!headers.isEmpty()){
+                ObjectMapper mapper = new ObjectMapper();
                 switch (headers.toArray()[0].toString()){
                     case "getAllServices":
+                        this.channel.basicPublish("",properties.getReplyTo(),replyProps,mapper.writeValueAsBytes(DbManager.getAllServices()));
                         break;
                     case "getServiceById":
-                        String s = "Test";
-                        this.channel.basicPublish("",properties.getReplyTo(),replyProps,s.getBytes());
+                        String serviceId = (String) properties.getHeaders().get("getServiceById");
+                        this.channel.basicPublish("",properties.getReplyTo(),replyProps,mapper.writeValueAsBytes(DbManager.getServiceById(serviceId)));
                         break;
                     case "getServicesByName":
                         break;
@@ -75,7 +82,6 @@ public class ThreadPoolService implements Runnable {
 
                 }
             }
-            System.out.println("Thread name: " + Thread.currentThread().getId() + " Message :" + new String(request.getBody()));
             this.channel.basicAck(request.getEnvelope().getDeliveryTag(), false);
         } catch (InterruptedException | IOException e) {
             e.printStackTrace();

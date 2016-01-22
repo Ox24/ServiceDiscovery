@@ -42,7 +42,7 @@ public class AMQPHandlerTest {
         String corrId = UUID.randomUUID().toString();
         Map<String, Object> header = new HashMap<>();
         Object a = "I want this header back";
-        header.put("getServiceById", a);
+        header.put("getAllServices", a);
 
         String message = "I want a request";
         com.rabbitmq.client.AMQP.BasicProperties props = new AMQP.BasicProperties
