@@ -1,19 +1,22 @@
 package api;
 
 import application.Application;
-import com.eclipsesource.restfuse.*;
+import com.eclipsesource.restfuse.Destination;
+import com.eclipsesource.restfuse.HttpJUnitRunner;
+import com.eclipsesource.restfuse.Method;
+import com.eclipsesource.restfuse.Response;
 import com.eclipsesource.restfuse.annotation.Context;
 import com.eclipsesource.restfuse.annotation.HttpTest;
-import org.junit.*;
-import org.junit.Assert;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
 import representation.service.Role;
 import representation.service.Service;
 import util.DbManager;
 
 import static com.eclipsesource.restfuse.Assert.assertOk;
-import static org.junit.Assert.*;
 
 /**
  * Created by Timur on 1/22/2016.

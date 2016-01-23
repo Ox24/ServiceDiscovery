@@ -23,9 +23,10 @@ public class ThreadPoolService implements Runnable {
 
     /**
      * Init connection and channel to rabbitmq for given thread
+     *
      * @param host
      */
-    private void init(String host){
+    private void init(String host) {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(host);
         RetryStrategy retryStrategy = new RetryStrategy(3, 1000);
@@ -62,24 +63,32 @@ public class ThreadPoolService implements Runnable {
                     .contentType("application/json")
                     .build();
             Set<String> headers = properties.getHeaders().keySet();
-            if(!headers.isEmpty()){
+            if (!headers.isEmpty()) {
                 ObjectMapper mapper = new ObjectMapper();
-                switch (headers.toArray()[0].toString()){
+                switch (headers.toArray()[0].toString()) {
                     case "getAllServices":
-                        this.channel.basicPublish("",properties.getReplyTo(),replyProps,mapper.writeValueAsBytes(DbManager.getAllServices()));
+                        this.channel.basicPublish("", properties.getReplyTo(), replyProps, mapper.writeValueAsBytes(DbManager.getAllServices()));
                         break;
                     case "getServiceById":
-                        String serviceId = (String) properties.getHeaders().get("getServiceById");
-                        this.channel.basicPublish("",properties.getReplyTo(),replyProps,mapper.writeValueAsBytes(DbManager.getServiceById(serviceId)));
+                        String serviceId = properties.getHeaders().get("getServiceById").toString();
+                        this.channel.basicPublish("", properties.getReplyTo(), replyProps, mapper.writeValueAsBytes(DbManager.getServiceById(serviceId)));
                         break;
                     case "getServicesByName":
+                        String serviceName = properties.getHeaders().get("getServicesByName").toString();
+                        this.channel.basicPublish("", properties.getReplyTo(), replyProps, mapper.writeValueAsBytes(DbManager.getServiceByName(serviceName)));
                         break;
                     case "getServicesByRoleName":
+                        this.channel.basicPublish("",
+                                properties.getReplyTo(),
+                                replyProps,
+                                mapper.writeValueAsBytes(DbManager.getServiceById(properties.getHeaders().get("getServicesByRoleName").toString())));
                         break;
                     case "registerService":
+                        this.channel.basicPublish("", properties.getReplyTo(), replyProps, mapper.writeValueAsBytes(DbManager.getServiceById(properties.getHeaders().get("getServicesByRoleName").toString())));
                         break;
                     case "unregisterService":
-
+                        this.channel.basicPublish("",properties.getReplyTo(),replyProps,mapper.writeValueAsBytes(DbManager.unregisterServiceByID(properties.getHeaders().get("unregisterService").toString())));
+                        break;
                 }
             }
             this.channel.basicAck(request.getEnvelope().getDeliveryTag(), false);
