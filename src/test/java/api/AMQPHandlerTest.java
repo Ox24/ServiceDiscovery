@@ -109,6 +109,120 @@ public class AMQPHandlerTest {
         Assert.assertEquals(serviceId, service1.getServiceId());
     }
 
+    @Test
+    public void testGetServiceByName() throws Exception{
+        String response;
+        String corrId = UUID.randomUUID().toString();
+        Map<String, Object> header = new HashMap<>();
+        Object a = serviceName;
+        header.put("getServicesByName", a);
+        ObjectMapper mapper = new ObjectMapper();
+        Service[] service1;
+
+        String message = "I want a request";
+        com.rabbitmq.client.AMQP.BasicProperties props = new AMQP.BasicProperties
+                .Builder()
+                .correlationId(corrId)
+                .replyTo(replyQueueName)
+                .headers(header)
+                .build();
+
+        channel.basicPublish("", requestQueueName, props, message.getBytes("UTF-8"));
+        while (true) {
+            QueueingConsumer.Delivery delivery = consumer.nextDelivery(5000);
+            if (delivery.getProperties().getCorrelationId().equals(corrId)) {
+                response = new String(delivery.getBody(),"UTF-8");
+                service1 = mapper.readValue(response, Service[].class);
+                break;
+            }
+        }
+        Assert.assertEquals(serviceName, service1[0].getServiceName());
+    }
+
+    @Test
+    public void testRegisterService() throws Exception{
+        String response;
+        String corrId = UUID.randomUUID().toString();
+        Map<String, Object> header = new HashMap<>();
+        ObjectMapper mapper = new ObjectMapper();
+        Service tmp_Service = new Service("1", "TestService", new Role("TEstRole"));
+        Service response_Service;
+        Object a = mapper.writeValueAsString(tmp_Service);
+        header.put("registerService", a);
+
+        String message = "I want a request";
+        com.rabbitmq.client.AMQP.BasicProperties props = new AMQP.BasicProperties
+                .Builder()
+                .correlationId(corrId)
+                .replyTo(replyQueueName)
+                .headers(header)
+                .build();
+
+        channel.basicPublish("", requestQueueName, props, message.getBytes("UTF-8"));
+        while (true) {
+            QueueingConsumer.Delivery delivery = consumer.nextDelivery(5000);
+            if (delivery.getProperties().getCorrelationId().equals(corrId)) {
+                response = new String(delivery.getBody(),"UTF-8");
+                response_Service = mapper.readValue(response, Service.class);
+                break;
+            }
+        }
+        Assert.assertNotEquals(tmp_Service.getServiceId(), response_Service.getServiceId());
+
+        header.clear();
+
+        header.put("unregisterService", response_Service.getServiceId());
+        com.rabbitmq.client.AMQP.BasicProperties props2 = new AMQP.BasicProperties
+                .Builder()
+                .correlationId(corrId)
+                .replyTo(replyQueueName)
+                .headers(header)
+                .build();
+
+        channel.basicPublish("", requestQueueName, props2, message.getBytes("UTF-8"));
+        while (true) {
+            QueueingConsumer.Delivery delivery = consumer.nextDelivery(5000);
+            if (delivery.getProperties().getCorrelationId().equals(corrId)) {
+                response = new String(delivery.getBody(),"UTF-8");
+                break;
+            }
+        }
+
+        Assert.assertEquals("Deleted", response);
+    }
+
+    @Test
+    public void testGetServicesByRoleName() throws Exception{
+        String response;
+        String corrId = UUID.randomUUID().toString();
+        Map<String, Object> header = new HashMap<>();
+        Object a = roleName;
+        header.put("getServicesByRoleName", a);
+        ObjectMapper mapper = new ObjectMapper();
+        Service[] service1;
+
+        String message = "I want a request";
+        com.rabbitmq.client.AMQP.BasicProperties props = new AMQP.BasicProperties
+                .Builder()
+                .correlationId(corrId)
+                .replyTo(replyQueueName)
+                .headers(header)
+                .build();
+
+        channel.basicPublish("", requestQueueName, props, message.getBytes("UTF-8"));
+        while (true) {
+            QueueingConsumer.Delivery delivery = consumer.nextDelivery(5000);
+            if (delivery.getProperties().getCorrelationId().equals(corrId)) {
+                response = new String(delivery.getBody(),"UTF-8");
+                service1 = mapper.readValue(response, Service[].class);
+                break;
+            }
+        }
+        Assert.assertEquals(roleName, service1[0].getRole().getName());
+    }
+
+
+
     @AfterClass
     public static void shutdown() throws Exception{
         DbManager.unregisterServiceByID(serviceId);

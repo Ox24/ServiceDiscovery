@@ -2,6 +2,7 @@ package amqp;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.*;
+import representation.service.Service;
 import util.DbManager;
 import util.RetryStrategy;
 import util.UtilConst;
@@ -81,13 +82,18 @@ public class ThreadPoolService implements Runnable {
                         this.channel.basicPublish("",
                                 properties.getReplyTo(),
                                 replyProps,
-                                mapper.writeValueAsBytes(DbManager.getServiceById(properties.getHeaders().get("getServicesByRoleName").toString())));
+                                mapper.writeValueAsBytes(DbManager.getServicesByRoleName(properties.getHeaders().get("getServicesByRoleName").toString())));
                         break;
                     case "registerService":
-                        this.channel.basicPublish("", properties.getReplyTo(), replyProps, mapper.writeValueAsBytes(DbManager.getServiceById(properties.getHeaders().get("getServicesByRoleName").toString())));
+                        Service tmpService = mapper.readValue(properties.getHeaders().get("registerService").toString().getBytes(), Service.class);
+                        this.channel.basicPublish("", properties.getReplyTo(), replyProps, mapper.writeValueAsBytes(DbManager.registerService(tmpService)));
                         break;
                     case "unregisterService":
-                        this.channel.basicPublish("",properties.getReplyTo(),replyProps,mapper.writeValueAsBytes(DbManager.unregisterServiceByID(properties.getHeaders().get("unregisterService").toString())));
+                        String responseMessage = "An error occured, Pls try again";
+                        if(DbManager.unregisterServiceByID(properties.getHeaders().get("unregisterService").toString())){
+                            responseMessage = "Deleted";
+                        }
+                        this.channel.basicPublish("",properties.getReplyTo(),replyProps, responseMessage.getBytes("UTF-8"));
                         break;
                 }
             }
