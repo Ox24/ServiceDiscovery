@@ -15,7 +15,7 @@ import java.util.concurrent.TimeoutException;
  * Created by Timur on 1/22/2016.
  * Copyright Timur Tasci, ISW Universität Stuttgart
  */
-public class ThreadPoolService implements Runnable {
+public class RequestService implements Runnable {
 
     private Connection connection = null;
     private Channel channel;
@@ -59,8 +59,8 @@ public class ThreadPoolService implements Runnable {
     @SuppressWarnings("InfiniteLoopStatement")
     @Override
     public void run() {
-        String responseMessage = "An error occured, Pls try again";
-        QueueingConsumer.Delivery request = null;
+        String responseMessage;
+        QueueingConsumer.Delivery request;
         init(UtilConst.MQM_LOCATION);
         while (true) {
             try {

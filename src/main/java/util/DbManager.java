@@ -37,6 +37,7 @@ public class DbManager {
     public static synchronized Service registerService(Service service){
         service.setServiceId(UUID.randomUUID().toString());
         service.setVersion((long)0);
+        service.setStatus(UtilConst.SERVICE_STATUS_ONLINE);
         if(db.isClosed())
             db.open(DB_USER,DB_PW);
         try{

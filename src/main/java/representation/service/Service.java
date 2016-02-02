@@ -10,11 +10,11 @@ public class Service {
     protected String ServiceName;
     protected Role role;
     protected Long version;
+    protected String status;
 
     public Service(){}
 
-    public Service(String ID, String ServiceName, Role role) {
-        this.ServiceId = ID;
+    public Service(String ServiceName, Role role) {
         this.ServiceName = ServiceName;
         this.role = role;
     }
@@ -49,5 +49,13 @@ public class Service {
 
     public void setVersion(Long version) {
         this.version = version;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

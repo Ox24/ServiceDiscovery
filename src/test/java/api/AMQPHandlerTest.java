@@ -46,7 +46,7 @@ public class AMQPHandlerTest {
         consumer = new QueueingConsumer(channel);
         channel.basicConsume(replyQueueName, true, consumer);
 
-        service = new Service("1",serviceName, new Role(roleName));
+        service = new Service(serviceName, new Role(roleName));
         service = DbManager.registerService(service);
         serviceId = service.getServiceId();
     }
@@ -145,7 +145,7 @@ public class AMQPHandlerTest {
         String corrId = UUID.randomUUID().toString();
         Map<String, Object> header = new HashMap<>();
         ObjectMapper mapper = new ObjectMapper();
-        Service tmp_Service = new Service("1", "TestService", new Role("TEstRole"));
+        Service tmp_Service = new Service("TestService", new Role("TEstRole"));
         Service response_Service;
         Object a = mapper.writeValueAsString(tmp_Service);
         header.put("registerService", a);
@@ -197,7 +197,7 @@ public class AMQPHandlerTest {
         String corrId = UUID.randomUUID().toString();
         Map<String, Object> header = new HashMap<>();
         ObjectMapper mapper = new ObjectMapper();
-        Service tmp_Service = new Service("1", "TestService", new Role("TEstRole"));
+        Service tmp_Service = new Service("TestService", new Role("TEstRole"));
         Service response_Service;
         Object a = mapper.writeValueAsString(tmp_Service);
         header.put("registerService", a);
@@ -240,7 +240,6 @@ public class AMQPHandlerTest {
                 break;
             }
         }
-
         Assert.assertEquals("Updated", response);
     }
 

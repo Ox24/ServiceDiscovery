@@ -1,6 +1,6 @@
 package application;
 
-import amqp.ThreadPoolService;
+import amqp.RequestService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
@@ -18,7 +18,7 @@ public class Application {
         ExecutorService executor = Executors.newFixedThreadPool(5);
         SpringApplication.run(Application.class, args);
         for(int i = 0; i < 5; i++){
-            executor.execute(new ThreadPoolService());
+            executor.execute(new RequestService());
         }
     }
 }

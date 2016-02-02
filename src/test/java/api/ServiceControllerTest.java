@@ -33,7 +33,7 @@ public class ServiceControllerTest {
     @BeforeClass
     public static void init(){
         Application.main(new String[] {});
-        service = new Service("1",serviceName, new Role(roleName));
+        service = new Service(serviceName, new Role(roleName));
         service = DbManager.registerService(service);
         serviceId = service.getServiceId();
     }
