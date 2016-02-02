@@ -38,17 +38,27 @@ public class DbManager {
         service.setServiceId(UUID.randomUUID().toString());
         service.setVersion((long)0);
         service.setStatus(UtilConst.SERVICE_STATUS_ONLINE);
+        List<Service> result;
         if(db.isClosed())
             db.open(DB_USER,DB_PW);
         try{
-            db.save(service);
+            result = createServiceFromDatabase(db.query(
+                    new OSQLSynchQuery<Service>("select * from Service where ServiceName = '"
+                            + service.getServiceName()
+                            + "'"
+                            + "OR ServiceId = '"
+                            + service.getServiceId() + "'")));
+            if(result.isEmpty())
+                db.save(service);
         }catch (Exception e){
             return null;
         }
         finally {
             db.close();
         }
-        return service;
+        if(result.isEmpty())
+            return service;
+        return result.get(0);
     }
 
     public static synchronized List<Service> getAllServices(){

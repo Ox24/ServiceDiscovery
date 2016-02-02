@@ -105,9 +105,11 @@ public class RequestService implements Runnable {
                         case "updateService":
                             responseMessage = "An error occured, Pls try again";
                             Service updateService = mapper.readValue(request.getBody(), Service.class);
-                            if (DbManager.updateServiceByID(properties.getHeaders().get("updateService").toString(), updateService))
+                            String service_ID = properties.getHeaders().get("updateService").toString();
+                            if (DbManager.updateServiceByID(service_ID, updateService))
                                 responseMessage = "Updated";
                             this.channel.basicPublish("", properties.getReplyTo(), replyProps, responseMessage.getBytes());
+                            PublishManager.pubStringToChannel(UtilConst.SERVICE_UPDATE_EXCHANGE, service_ID);
                             break;
                     }
                 }
