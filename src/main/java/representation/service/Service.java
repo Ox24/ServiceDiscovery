@@ -9,6 +9,7 @@ public class Service {
     protected String ServiceId;
     protected String ServiceName;
     protected Role role;
+    protected Long version;
 
     public Service(){}
 
@@ -40,5 +41,13 @@ public class Service {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 }

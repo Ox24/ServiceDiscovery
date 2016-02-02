@@ -36,6 +36,7 @@ public class DbManager {
 
     public static synchronized Service registerService(Service service){
         service.setServiceId(UUID.randomUUID().toString());
+        service.setVersion((long)0);
         if(db.isClosed())
             db.open(DB_USER,DB_PW);
         try{
@@ -100,7 +101,7 @@ public class DbManager {
             db.open(DB_USER,DB_PW);
         try {
             result = createServiceFromDatabase(db.query(
-                    new OSQLSynchQuery<Service>("select * from Role where Name = '" + name + "'")));
+                    new OSQLSynchQuery<Service>("select * from Service where role.name = '" + name + "'")));
 
         }finally {
             db.close();
@@ -127,7 +128,30 @@ public class DbManager {
         return true;
     }
 
-    private static List<Service> createServiceFromDatabase(List<Service> services){
+    public static synchronized boolean updateServiceByID(String ID, Service service){
+        List<Service> result;
+        List<Service> handlerles_services;
+        if(db.isClosed())
+            db.open(DB_USER,DB_PW);
+        try {
+            result = db.query(
+                    new OSQLSynchQuery<Service>("select * from Service where ServiceId = '" + ID + "'"));
+            handlerles_services = createServiceFromDatabase(result);
+            for (Service db_service : result){
+                db_service.setRole(service.getRole());
+                db_service.setVersion(handlerles_services.get(0).getVersion() + 1);
+                db.save(db_service);
+            }
+        }catch (Exception e){
+            return false;
+        }
+        finally {
+            db.close();
+        }
+        return true;
+    }
+
+    private static synchronized List<Service> createServiceFromDatabase(List<Service> services){
         ODatabaseRecordThreadLocal.INSTANCE.set(db.getUnderlying());
         List<Service> handlerLessServices = new LinkedList<>();
         for(Service service : services){

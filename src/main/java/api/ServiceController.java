@@ -50,4 +50,11 @@ public class ServiceController {
         return HttpStatus.CONFLICT;
     }
 
+    @RequestMapping(value = "/api/service/update/{serviceID}", method = RequestMethod.PATCH)
+    public HttpStatus updateService(@PathVariable String serviceID, @RequestBody Service service){
+        if(DbManager.updateServiceByID(serviceID, service))
+            return HttpStatus.OK;
+        return HttpStatus.CONFLICT;
+    }
+
 }

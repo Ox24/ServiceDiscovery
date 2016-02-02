@@ -7,20 +7,21 @@ import java.util.List;
 /**
  * Created by Timur on 1/22/2016.
  * Copyright Timur Tasci, ISW Universität Stuttgart
+ *
+ * Service Handler to manage all request from amqp or rest api and future OPC UA api
  */
 public interface ServiceHandlerInterface {
 
-    public List<Service> getAllServices();
+    List<Service> getAllServices();
 
-    public Service getServiceById(String ID);
+    Service getServiceById(String ID);
 
-    public List<Service> getServicesByName(String serviceName);
+    List<Service> getServicesByName(String serviceName);
 
-    public List<Service> getServicesByRoleName(String roleName);
+    List<Service> getServicesByRoleName(String roleName);
 
-    public Service registerService(Service service);
+    Service registerService(Service service);
 
-    public boolean unregisterService(String id);
-
+    boolean unregisterService(String id);
 
 }

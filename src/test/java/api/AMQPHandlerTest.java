@@ -192,6 +192,59 @@ public class AMQPHandlerTest {
     }
 
     @Test
+    public void testUpdateService() throws Exception{
+        String response;
+        String corrId = UUID.randomUUID().toString();
+        Map<String, Object> header = new HashMap<>();
+        ObjectMapper mapper = new ObjectMapper();
+        Service tmp_Service = new Service("1", "TestService", new Role("TEstRole"));
+        Service response_Service;
+        Object a = mapper.writeValueAsString(tmp_Service);
+        header.put("registerService", a);
+
+        String message = "I want a request";
+        com.rabbitmq.client.AMQP.BasicProperties props = new AMQP.BasicProperties
+                .Builder()
+                .correlationId(corrId)
+                .replyTo(replyQueueName)
+                .headers(header)
+                .build();
+
+        channel.basicPublish("", requestQueueName, props, message.getBytes("UTF-8"));
+        while (true) {
+            QueueingConsumer.Delivery delivery = consumer.nextDelivery(5000);
+            if (delivery.getProperties().getCorrelationId().equals(corrId)) {
+                response = new String(delivery.getBody(),"UTF-8");
+                response_Service = mapper.readValue(response, Service.class);
+                break;
+            }
+        }
+        Assert.assertNotEquals(tmp_Service.getServiceId(), response_Service.getServiceId());
+
+        header.clear();
+
+        header.put("updateService", response_Service.getServiceId());
+        response_Service.setRole(new Role("UpdatedRole"));
+        com.rabbitmq.client.AMQP.BasicProperties props2 = new AMQP.BasicProperties
+                .Builder()
+                .correlationId(corrId)
+                .replyTo(replyQueueName)
+                .headers(header)
+                .build();
+
+        channel.basicPublish("", requestQueueName, props2, mapper.writeValueAsString(response_Service).getBytes("UTF-8"));
+        while (true) {
+            QueueingConsumer.Delivery delivery = consumer.nextDelivery(5000);
+            if (delivery.getProperties().getCorrelationId().equals(corrId)) {
+                response = new String(delivery.getBody(),"UTF-8");
+                break;
+            }
+        }
+
+        Assert.assertEquals("Updated", response);
+    }
+
+    @Test
     public void testGetServicesByRoleName() throws Exception{
         String response;
         String corrId = UUID.randomUUID().toString();

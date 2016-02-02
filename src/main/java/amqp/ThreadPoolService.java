@@ -25,7 +25,7 @@ public class ThreadPoolService implements Runnable {
     /**
      * Init connection and channel to rabbitmq for given thread
      *
-     * @param host
+     * @param host for cluster to connect
      */
     private void init(String host) {
         ConnectionFactory factory = new ConnectionFactory();
@@ -51,55 +51,70 @@ public class ThreadPoolService implements Runnable {
         }
     }
 
-
+    /**
+     * Main function of this worker.
+     * First init the connection and the queue listing to.
+     * Infitloop for request/response with services
+     */
     @SuppressWarnings("InfiniteLoopStatement")
     @Override
     public void run() {
+        String responseMessage = "An error occured, Pls try again";
+        QueueingConsumer.Delivery request = null;
         init(UtilConst.MQM_LOCATION);
-        while (true) try {
-            QueueingConsumer.Delivery request = this.consumer.nextDelivery();
-            BasicProperties properties = request.getProperties();
-            com.rabbitmq.client.AMQP.BasicProperties replyProps = new AMQP.BasicProperties.Builder()
-                    .correlationId(properties.getCorrelationId())
-                    .contentType("application/json")
-                    .build();
-            Set<String> headers = properties.getHeaders().keySet();
-            if (!headers.isEmpty()) {
-                ObjectMapper mapper = new ObjectMapper();
-                switch (headers.toArray()[0].toString()) {
-                    case "getAllServices":
-                        this.channel.basicPublish("", properties.getReplyTo(), replyProps, mapper.writeValueAsBytes(DbManager.getAllServices()));
-                        break;
-                    case "getServiceById":
-                        String serviceId = properties.getHeaders().get("getServiceById").toString();
-                        this.channel.basicPublish("", properties.getReplyTo(), replyProps, mapper.writeValueAsBytes(DbManager.getServiceById(serviceId)));
-                        break;
-                    case "getServicesByName":
-                        String serviceName = properties.getHeaders().get("getServicesByName").toString();
-                        this.channel.basicPublish("", properties.getReplyTo(), replyProps, mapper.writeValueAsBytes(DbManager.getServiceByName(serviceName)));
-                        break;
-                    case "getServicesByRoleName":
-                        this.channel.basicPublish("",
-                                properties.getReplyTo(),
-                                replyProps,
-                                mapper.writeValueAsBytes(DbManager.getServicesByRoleName(properties.getHeaders().get("getServicesByRoleName").toString())));
-                        break;
-                    case "registerService":
-                        Service tmpService = mapper.readValue(properties.getHeaders().get("registerService").toString().getBytes(), Service.class);
-                        this.channel.basicPublish("", properties.getReplyTo(), replyProps, mapper.writeValueAsBytes(DbManager.registerService(tmpService)));
-                        break;
-                    case "unregisterService":
-                        String responseMessage = "An error occured, Pls try again";
-                        if(DbManager.unregisterServiceByID(properties.getHeaders().get("unregisterService").toString())){
-                            responseMessage = "Deleted";
-                        }
-                        this.channel.basicPublish("",properties.getReplyTo(),replyProps, responseMessage.getBytes("UTF-8"));
-                        break;
+        while (true) {
+            try {
+                request = this.consumer.nextDelivery();
+                BasicProperties properties = request.getProperties();
+                AMQP.BasicProperties replyProps = new AMQP.BasicProperties.Builder()
+                        .correlationId(properties.getCorrelationId())
+                        .contentType("application/json")
+                        .build();
+                Set<String> headers = properties.getHeaders().keySet();
+                if (!headers.isEmpty()) {
+                    ObjectMapper mapper = new ObjectMapper();
+                    switch (headers.toArray()[0].toString()) {
+                        case "getAllServices":
+                            this.channel.basicPublish("", properties.getReplyTo(), replyProps, mapper.writeValueAsBytes(DbManager.getAllServices()));
+                            break;
+                        case "getServiceById":
+                            String serviceId = properties.getHeaders().get("getServiceById").toString();
+                            this.channel.basicPublish("", properties.getReplyTo(), replyProps, mapper.writeValueAsBytes(DbManager.getServiceById(serviceId)));
+                            break;
+                        case "getServicesByName":
+                            String serviceName = properties.getHeaders().get("getServicesByName").toString();
+                            this.channel.basicPublish("", properties.getReplyTo(), replyProps, mapper.writeValueAsBytes(DbManager.getServiceByName(serviceName)));
+                            break;
+                        case "getServicesByRoleName":
+                            this.channel.basicPublish("",
+                                    properties.getReplyTo(),
+                                    replyProps,
+                                    mapper.writeValueAsBytes(DbManager.getServicesByRoleName(properties.getHeaders().get("getServicesByRoleName").toString())));
+                            break;
+                        case "registerService":
+                            Service tmpService = mapper.readValue(properties.getHeaders().get("registerService").toString().getBytes(), Service.class);
+                            this.channel.basicPublish("", properties.getReplyTo(), replyProps, mapper.writeValueAsBytes(DbManager.registerService(tmpService)));
+                            break;
+                        case "unregisterService":
+                            responseMessage = "An error occured, Pls try again";
+                            if (DbManager.unregisterServiceByID(properties.getHeaders().get("unregisterService").toString())) {
+                                responseMessage = "Deleted";
+                            }
+                            this.channel.basicPublish("", properties.getReplyTo(), replyProps, responseMessage.getBytes("UTF-8"));
+                            break;
+                        case "updateService":
+                            responseMessage = "An error occured, Pls try again";
+                            Service updateService = mapper.readValue(request.getBody(), Service.class);
+                            if (DbManager.updateServiceByID(properties.getHeaders().get("updateService").toString(), updateService))
+                                responseMessage = "Updated";
+                            this.channel.basicPublish("", properties.getReplyTo(), replyProps, responseMessage.getBytes());
+                            break;
+                    }
                 }
+                this.channel.basicAck(request.getEnvelope().getDeliveryTag(), false);
+            } catch (InterruptedException | IOException e) {
+                e.printStackTrace();
             }
-            this.channel.basicAck(request.getEnvelope().getDeliveryTag(), false);
-        } catch (InterruptedException | IOException e) {
-            e.printStackTrace();
         }
     }
 }
