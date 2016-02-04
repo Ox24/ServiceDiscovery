@@ -4,7 +4,7 @@ package representation.service;
  * Created by Timur on 1/14/2016.
  */
 public class MessageInterface {
-    protected String MessageID;
+    protected String InterfaceID;
     protected MessageInterfaceType Type;
     protected Message In;
     protected Message Out;
@@ -12,26 +12,26 @@ public class MessageInterface {
     public MessageInterface() {
     }
 
-    public MessageInterface(String MessageID, MessageInterfaceType type, Message in, Message out) {
-        this.MessageID = MessageID;
+    public MessageInterface(String InterfaceID, MessageInterfaceType type, Message in, Message out) {
+        this.InterfaceID = InterfaceID;
         Type = type;
         In = in;
         Out = out;
     }
 
-    public MessageInterface(String MessageID, MessageInterfaceType type) {
-        this.MessageID = MessageID;
+    public MessageInterface(String InterfaceID, MessageInterfaceType type) {
+        this.InterfaceID = InterfaceID;
         Type = type;
     }
     
     
 
-    public String getMessageID() {
-        return MessageID;
+    public String getInterfaceID() {
+        return InterfaceID;
     }
 
-    public void setMessageID(String messageID) {
-        this.MessageID = messageID;
+    public void setInterfaceID(String interfaceID) {
+        this.InterfaceID = interfaceID;
     }
 
     public MessageInterfaceType getType() {
